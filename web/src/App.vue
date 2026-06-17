@@ -1,5 +1,5 @@
 <template>
-  <div class="m-4 bg-black rounded-md p-2 text-2xl">
+  <div class="m-4 rounded-md text-2xl">
     <div class="flex gap-6">
       <div class="flex items-center gap-1">
         <div v-if="mapName" class="flex items-center gap-1">
@@ -47,7 +47,6 @@
       type="overall"
       :wr="overallWr"
       :pb="overallPb"
-      :gain="overallGain"
       :player-profile="playerProfile"
       :wr-holder-profile="overallWrHolderProfile"
     />
@@ -57,7 +56,6 @@
       type="pro"
       :wr="proWr"
       :pb="proPb"
-      :gain="proGain"
       :player-profile="playerProfile"
       :wr-holder-profile="proWrHolderProfile"
     />
@@ -103,22 +101,6 @@ const courseTier = computed(() => {
   if (map.value && mode.value && courseName.value) {
     const courseIndex = map.value.courses.findIndex((course) => course.name === courseName.value)!
     return map.value.courses[courseIndex]!.filters[mode.value].nub_tier
-  } else {
-    return null
-  }
-})
-
-const overallGain = computed(() => {
-  if (overallWr.value && overallPb.value) {
-    return overallPb.value.time - overallWr.value.time
-  } else {
-    return null
-  }
-})
-
-const proGain = computed(() => {
-  if (proWr.value && proPb.value) {
-    return proPb.value.time - proWr.value.time
   } else {
     return null
   }
