@@ -11,7 +11,7 @@
       <div class="flex items-start gap-1">
         <span class="text-gray-100">{{ formatTime(wr.time) }}</span>
         <div
-          class="flex justify-center items-center text-gray-100 text-sm leading-3 rounded-sm px-1"
+          class="flex justify-center items-center text-gray-100 text-sm  rounded-sm px-1"
           :class="wr.teleports > 0 ? 'bg-yellow-600' : 'bg-blue-600'"
         >
           {{ wr.teleports > 0 ? 'TP' : 'PRO' }}
@@ -21,7 +21,7 @@
       <div v-if="gain === 0" class="flex gap-1">
         <img
           v-if="playerProfile"
-          class="rounded-full w-8 h-auto"
+          class="rounded-full w-8 h-auto ring-1 ring-slate-100"
           :src="playerProfile.avatar_url"
           alt=""
         />
@@ -30,7 +30,7 @@
       <div v-else class="flex gap-1">
         <img
           v-if="wrHolderProfile"
-          class="rounded-full w-8 h-auto"
+          class="rounded-full w-8 h-auto ring-1 ring-gray-400"
           :src="wrHolderProfile.avatar_url"
           alt=""
         />

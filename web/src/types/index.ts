@@ -11,13 +11,6 @@ export type Tier =
   | 'unfeasible'
   | 'impossible'
 
-export interface GameState {
-  mapName: string | null
-  courseName: string | null
-  mode: Mode | null
-  steamId: string | null
-}
-
 export interface Record {
   id: string
   player: {

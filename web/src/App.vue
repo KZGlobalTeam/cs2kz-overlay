@@ -25,7 +25,7 @@
           <span class="text-gray-400">Course:</span>
           <span class="text-gray-100 font-medium">{{ courseName }}</span>
         </div>
-        <span class="text-gray-400">/</span>
+        <span v-if="courseTier" class="text-gray-400">/</span>
         <span
           v-if="courseTier"
           :style="{
@@ -43,7 +43,7 @@
     </div>
 
     <RecordRow
-      v-if="mapStatus === 'GLOBAL'"
+      v-if="mapStatus === 'GLOBAL' && courseName"
       type="overall"
       :wr="overallWr"
       :pb="overallPb"
@@ -53,7 +53,7 @@
     />
 
     <RecordRow
-      v-if="mapStatus === 'GLOBAL'"
+      v-if="mapStatus === 'GLOBAL' && courseName"
       type="pro"
       :wr="proWr"
       :pb="proPb"
@@ -66,15 +66,16 @@
 
 <script setup lang="ts">
 import { computed, ref, watch } from 'vue'
-import type { GameState, Map, PlayerProfile, Record, RecordResponse } from './types'
+import type { Map, PlayerProfile, Record, RecordResponse } from './types'
 import { api, tierNumberMap, tierColorMap } from './utils'
 import RecordRow from './components/RecordRow.vue'
 
-const mapName = ref<string | null>(null)
+const mapName = ref<string>('')
 const map = ref<Map | null>(null)
-const courseName = ref<string | null>(null)
-const modeName = ref<string | null>(null)
-const playerId = ref<string | null>(null)
+const courseName = ref<string>('')
+const modeName = ref<string>('')
+const playerId = ref<string>('')
+const timerStatus = ref<string>('')
 const overallPb = ref<Record | null>(null)
 const proPb = ref<Record | null>(null)
 const overallWr = ref<Record | null>(null)
@@ -123,47 +124,83 @@ const proGain = computed(() => {
   }
 })
 
-watch(playerId, async (playerId) => {
-  if (playerId) {
-    playerProfile.value = await getProfile(playerId)
-  }
-})
-
-watch(mapName, (mapName) => {
-  if (mapName) {
-    getMapInfo()
-  }
-})
-
 watch(
-  [() => mapName.value, () => courseName.value, () => mode.value],
-  ([mapName, courseName, mode]) => {
-    if (mapName && courseName && mode) {
-      getWr()
+  () => playerId.value,
+  async (playerId) => {
+    playerProfile.value = null
+    if (playerId) {
+      playerProfile.value = await getProfile(playerId)
     }
   },
+  { immediate: true },
 )
 
 watch(
-  [() => mapName.value, () => courseName.value, () => mode.value, () => playerId.value],
-  ([mapName, courseName, mode, playerId]) => {
-    if (mapName && courseName && mode && playerId) {
+  () => timerStatus.value,
+  (timerStatus) => {
+    if (timerStatus === 'finished') {
+      overallWr.value = null
+      proWr.value = null
+      overallPb.value = null
+      proPb.value = null
+      getWr()
       getPb()
     }
   },
 )
 
-watch(overallWr, async (overallWr) => {
-  if (overallWr) {
-    overallWrHolderProfile.value = await getProfile(overallWr.player.id)
-  }
-})
+watch(
+  () => mapName.value,
+  (mapName) => {
+    map.value = null
+    if (mapName !== '<empty>' && mapName !== '') {
+      getMapInfo()
+    }
+  },
+  { immediate: true },
+)
 
-watch(proWr, async (proWr) => {
-  if (proWr) {
-    proWrHolderProfile.value = await getProfile(proWr.player.id)
-  }
-})
+watch(
+  [() => mapName.value, () => courseName.value, () => mode.value],
+  ([mapName, courseName, mode]) => {
+    overallWr.value = null
+    proWr.value = null
+    if (mapName !== '<empty>' && mapName !== '' && courseName && mode) {
+      getWr()
+    }
+  },
+  { immediate: true },
+)
+
+watch(
+  [() => mapName.value, () => courseName.value, () => mode.value, () => playerId.value],
+  ([mapName, courseName, mode, playerId]) => {
+    overallPb.value = null
+    proPb.value = null
+    if (mapName !== '<empty>' && mapName !== '' && courseName && mode && playerId) {
+      getPb()
+    }
+  },
+  { immediate: true },
+)
+
+watch(
+  () => overallWr.value,
+  async (overallWr) => {
+    if (overallWr) {
+      overallWrHolderProfile.value = await getProfile(overallWr.player.id)
+    }
+  },
+)
+
+watch(
+  () => proWr.value,
+  async (proWr) => {
+    if (proWr) {
+      proWrHolderProfile.value = await getProfile(proWr.player.id)
+    }
+  },
+)
 
 initListener()
 
@@ -274,18 +311,20 @@ async function getWr() {
 }
 
 function initListener() {
-  mapName.value = 'kz_antimony'
-  courseName.value = 'Main'
-  modeName.value = 'CKZ'
-  playerId.value = '76561199067702427'
-  // const eventSource = new EventSource('http://127.0.0.1:4433/events')
+  // mapName.value = 'kz_antimony'
+  // courseName.value = 'Main'
+  // modeName.value = 'CKZ'
+  // playerId.value = '76561199067702427'
+  const eventSource = new EventSource('http://127.0.0.1:4433/events')
 
-  // eventSource.onmessage = (event: MessageEvent<GameState>) => {
-  //   mapName.value = event.data.map
-  //   courseName.value = event.data.course
-  //   mode.value = event.data.mode
-  //   playerId.value = event.data.steamId
-  // }
+  eventSource.onmessage = (event: MessageEvent<string>) => {
+    const data = JSON.parse(event.data)
+    mapName.value = data.map
+    courseName.value = data.course
+    modeName.value = data.mode
+    playerId.value = data.steamID
+    timerStatus.value = data.timer
+  }
 }
 </script>
 
