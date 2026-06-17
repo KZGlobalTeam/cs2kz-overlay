@@ -15,11 +15,12 @@ import (
 type GameState struct {
 	MapName     string    `json:"map"`
 	CourseName  string    `json:"course"`
-	PlayerID    uint64    `json:"steamID"`
+	PlayerID    uint64    `json:"steamID,string"`
 	PlayerMode  string    `json:"mode"`
 	Splits      []float32 `json:"splits"`
 	Checkpoints []float32 `json:"checkpoints"`
 	Stages      []float32 `json:"stages"`
+	TimerState  string    `json:"timer"`
 }
 
 var (

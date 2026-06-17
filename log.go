@@ -61,6 +61,35 @@ func parseTimerStart(line string) bool {
 	gameState.Splits = make([]float32, splits)
 	gameState.Checkpoints = make([]float32, checkpoints)
 	gameState.Stages = make([]float32, stages)
+	gameState.TimerState = "running"
+	return true
+}
+
+func parseTimerStop(line string) bool {
+	var re = regexp.MustCompile(`^\d{2}\/\d{2} \d{2}:\d{2}:\d{2} \[CS2KZ\] timer_stop`)
+	matches := re.FindStringSubmatch(line)
+	if len(matches) < 1 {
+		return false
+	}
+	if gameState.TimerState != "running" {
+		fmt.Printf("Warning: timer_stop received but timer was not running (current state: %s)\n", gameState.TimerState)
+		return false
+	}
+	gameState.TimerState = "stopped"
+	return true
+}
+
+func parseTimerEnd(line string) bool {
+	var re = regexp.MustCompile(`^\d{2}\/\d{2} \d{2}:\d{2}:\d{2} \[CS2KZ\] timer_end`)
+	matches := re.FindStringSubmatch(line)
+	if len(matches) < 1 {
+		return false
+	}
+	if gameState.TimerState != "running" {
+		fmt.Printf("Warning: timer_end received but timer was not running (current state: %s)\n", gameState.TimerState)
+		return false
+	}
+	gameState.TimerState = "finished"
 	return true
 }
 
@@ -118,6 +147,14 @@ func parseLogLine(line string) bool {
 	}
 
 	if parseTimerStart(line) {
+		return true
+	}
+
+	if parseTimerStop(line) {
+		return true
+	}
+
+	if parseTimerEnd(line) {
 		return true
 	}
 
