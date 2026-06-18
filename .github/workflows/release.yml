@@ -45,12 +45,6 @@ jobs:
           GOOS=windows GOARCH=amd64 go build -o bin/cs2kz-overlay-socket-windows.exe .
           GOOS=linux   GOARCH=amd64 go build -o bin/cs2kz-overlay-socket-linux .
 
-      - name: Create release
-        uses: softprops/action-gh-release@v2
-        with:
-          files: bin/*
-          generate_release_notes: true
-
       - name: Package release archives
         run: |
           cp -r web/dist bin/web
