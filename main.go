@@ -42,6 +42,9 @@ func broadcast(message string) {
 }
 
 func listen() {
+	// Serve static files for release builds
+	http.Handle("/", http.FileServer(http.Dir("web")))
+
 	http.HandleFunc("/events", func(w http.ResponseWriter, r *http.Request) {
 		w.Header().Set("Access-Control-Allow-Origin", "*")
 		w.Header().Set("Access-Control-Allow-Headers", "Content-Type")
