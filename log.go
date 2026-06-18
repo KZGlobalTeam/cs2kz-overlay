@@ -72,7 +72,9 @@ func parseTimerStop(line string) bool {
 		return false
 	}
 	if gameState.TimerState != "running" {
-		fmt.Printf("Warning: timer_stop received but timer was not running (current state: %s)\n", gameState.TimerState)
+		if gameState.TimerState != "" {
+			fmt.Printf("Warning: timer_stop received but timer was not running (current state: %s)\n", gameState.TimerState)
+		}
 		return false
 	}
 	gameState.TimerState = "stopped"
@@ -86,7 +88,9 @@ func parseTimerEnd(line string) bool {
 		return false
 	}
 	if gameState.TimerState != "running" {
-		fmt.Printf("Warning: timer_end received but timer was not running (current state: %s)\n", gameState.TimerState)
+		if gameState.TimerState != "" {
+			fmt.Printf("Warning: timer_end received but timer was not running (current state: %s)\n", gameState.TimerState)
+		}
 		return false
 	}
 	gameState.TimerState = "finished"
