@@ -1,10 +1,8 @@
 <template>
   <div class="flex mt-2 gap-2">
-    <span
-      :class="type === 'overall' ? 'text-yellow-600' : 'text-blue-600'"
-      class="w-26 text-right"
-      >{{ type.toUpperCase() }}</span
-    >
+    <span :class="type === 'all' ? 'text-yellow-600' : 'text-blue-600'" class="w-12 text-right">{{
+      type.toUpperCase()
+    }}</span>
     <span class="text-gray-400">|</span>
 
     <div v-if="wr" class="flex gap-3">
@@ -26,9 +24,7 @@
           :src="wrHolderProfile.avatar_url"
           alt=""
         />
-        <span :class="gain === 0 ? 'text-green-500' : 'text-cyan-500'">{{
-          gain === 0 ? 'Me' : wr.player.name
-        }}</span>
+        <span :class="gain === 0 ? 'text-green-500' : 'text-cyan-500'">{{ wr.player.name }}</span>
       </div>
       <span class="text-amber-600" v-if="gain && gain > 0">{{ `(+${formatTime(gain)})` }}</span>
     </div>
@@ -42,7 +38,7 @@ import type { PlayerProfile, Record } from '@/types'
 import { formatTime } from '@/utils'
 
 const props = defineProps<{
-  type: 'overall' | 'pro'
+  type: 'all' | 'pro'
   wr: Record | null
   pb: Record | null
   wrHolderProfile: PlayerProfile | null

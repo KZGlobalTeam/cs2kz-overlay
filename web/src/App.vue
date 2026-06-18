@@ -1,7 +1,7 @@
 <template>
   <div class="m-4 rounded-md text-2xl">
-    <div class="flex gap-6">
-      <div v-if="mapName" class="flex items-center gap-1">
+    <div v-if="mapName !== '<empty>' && mapName !== ''" class="flex gap-6">
+      <div class="flex items-center gap-1.5">
         <div class="flex items-center gap-1">
           <span class="text-gray-400">Map:</span>
           <span class="text-white font-medium">{{ mapName }}</span>
@@ -25,14 +25,45 @@
           <span class="text-gray-400">Course:</span>
           <span class="text-gray-100 font-medium">{{ courseName }}</span>
         </div>
-        <span v-if="courseTier" class="text-gray-400">/</span>
+        <span v-if="courseTiers" class="text-gray-600">/</span>
+        <template v-if="courseTiers && courseTiers.nub !== courseTiers.pro">
+          <div class="flex items-start gap-1">
+            <span
+              :style="{
+                color: tierColorMap[courseTiers.nub],
+              }"
+            >
+              T{{ tierNumberMap[courseTiers.nub] }}
+            </span>
+            <div
+              class="flex justify-center items-center bg-yellow-600 text-gray-100 text-sm rounded-sm px-1"
+            >
+              TP
+            </div>
+          </div>
+          <span class="text-gray-600">-</span>
+          <div class="flex items-start gap-1">
+            <span
+              :style="{
+                color: tierColorMap[courseTiers.pro],
+              }"
+            >
+              T{{ tierNumberMap[courseTiers.pro] }}
+            </span>
+            <div
+              class="flex justify-center items-center bg-blue-600 text-gray-100 text-sm rounded-sm px-1"
+            >
+              PRO
+            </div>
+          </div>
+        </template>
         <span
-          v-if="courseTier"
+          v-else-if="courseTiers"
           :style="{
-            color: tierColorMap[courseTier],
+            color: tierColorMap[courseTiers.nub],
           }"
         >
-          T{{ tierNumberMap[courseTier] }}
+          T{{ tierNumberMap[courseTiers.nub] }}
         </span>
       </div>
 
@@ -44,7 +75,7 @@
 
     <RecordRow
       v-if="mapStatus === 'GLOBAL' && courseName"
-      type="overall"
+      type="all"
       :wr="overallWr"
       :pb="overallPb"
       :player-profile="playerProfile"
@@ -97,10 +128,12 @@ const mapStatus = computed(() => {
     return 'NON-GLOBAL'
   }
 })
-const courseTier = computed(() => {
+const courseTiers = computed(() => {
   if (map.value && mode.value && courseName.value) {
     const courseIndex = map.value.courses.findIndex((course) => course.name === courseName.value)!
-    return map.value.courses[courseIndex]!.filters[mode.value].nub_tier
+    const filter = map.value.courses[courseIndex]!.filters[mode.value]
+    return { nub: filter.nub_tier, pro: filter.pro_tier }
+    return
   } else {
     return null
   }
