@@ -5,7 +5,7 @@ Overlay intended for CS2KZ streamers.
 ---
 
 ## Installation
-1. Add `-condebug -conclearlog` to your CS2 launch options. This tells CS2 to write console output to a log file that will be read by the Go socket.
+1. Add `-condebug -conclearlog` to your CS2 launch options and enable map overlay helper by typing !mapoverlay while in CS2KZ servers. This tells CS2 to write relevant console output to a log file that will be read by the Go socket.
 
 2. Download the latest release for your OS from the [releases page](https://github.com/KZGlobalTeam/cs2kz-overlay/releases) and extract the archive
 3. Run the binary:
