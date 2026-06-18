@@ -1,8 +1,8 @@
 <template>
   <div class="m-4 rounded-md text-2xl">
     <div class="flex gap-6">
-      <div class="flex items-center gap-1">
-        <div v-if="mapName" class="flex items-center gap-1">
+      <div v-if="mapName" class="flex items-center gap-1">
+        <div class="flex items-center gap-1">
           <span class="text-gray-400">Map:</span>
           <span class="text-white font-medium">{{ mapName }}</span>
         </div>
