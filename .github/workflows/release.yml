@@ -23,13 +23,39 @@ jobs:
           path: ~/.cache/go-build
           key: ${{ runner.os }}-go-${{ hashFiles('**/go.sum') }}
 
+      - uses: pnpm/action-setup@v4
+        with:
+          version: 11
+          package_json_file: web/package.json
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 24
+          cache: pnpm
+          cache-dependency-path: web/pnpm-lock.yaml
+
+      - name: Build web
+        working-directory: web
+        run: |
+          pnpm install --frozen-lockfile
+          pnpm build
+
       - name: Build binaries
         run: |
           GOOS=windows GOARCH=amd64 go build -o bin/cs2kz-overlay-socket-windows.exe .
           GOOS=linux   GOARCH=amd64 go build -o bin/cs2kz-overlay-socket-linux .
 
+      - name: Package release archives
+        run: |
+          cp -r web/dist bin/web
+          cd bin
+          zip -r cs2kz-overlay-windows.zip cs2kz-overlay-socket-windows.exe web/
+          tar -czf cs2kz-overlay-linux.tar.gz cs2kz-overlay-socket-linux web/
+
       - name: Create release
         uses: softprops/action-gh-release@v2
         with:
-          files: bin/*
+          files: |
+            bin/cs2kz-overlay-windows.zip
+            bin/cs2kz-overlay-linux.tar.gz
           generate_release_notes: true

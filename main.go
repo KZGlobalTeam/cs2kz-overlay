@@ -42,6 +42,9 @@ func broadcast(message string) {
 }
 
 func listen() {
+	// Serve static files for release builds
+	http.Handle("/", http.FileServer(http.Dir("web")))
+
 	http.HandleFunc("/events", func(w http.ResponseWriter, r *http.Request) {
 		w.Header().Set("Access-Control-Allow-Origin", "*")
 		w.Header().Set("Access-Control-Allow-Headers", "Content-Type")
@@ -85,6 +88,10 @@ func listen() {
 	if err := http.ListenAndServe("127.0.0.1:4433", nil); err != nil {
 		log.Fatal("failed to start server:", err)
 	}
+
+	// Note: This is only true for release builds.
+	fmt.Println("Server started at http://127.0.0.1:4433")
+	fmt.Println("Please make sure to enable `-condebug -conclearlog` in your CS2 launch options and use `!mapoverlay` while in CS2KZ servers for proper functionality.")
 }
 
 func watchLog(logFilePath string) {
